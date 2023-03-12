@@ -27,11 +27,31 @@ exports.create = (req, res) => {
 
 //Retrieve and return all users & Retrieve a single user
 exports.find = (req, res) => {
+    Userdb.find().then(user => {
+        res.send(user)
+    }).catch(err => {
+        res.status(500).send({ message : err.message || "Error occured while trying to retrieve user information."})
+    })
 
 }
 
 //Update a new user identified by their ID
 exports.update = (req, res) => {
+    if(!req.body){
+        return res.status(400).send({ message : "Data to update can not be empty." })
+    }
+
+    const id = req.params.id;
+    Userdb.findByIdAndUpdate(id, req.body, {useFindAndModify : false}).then(data => {
+        if(!data){
+            res.status(404).send({ message : `Cannot update user with ${id}. User may not exist.`})
+        }
+        else {
+            res.send(data)
+        }
+    }).catch(err => {
+        res.status(500).send({ message : "Error, please update user information." })
+    })
 
 }
 
