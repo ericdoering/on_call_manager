@@ -27,12 +27,31 @@ exports.create = (req, res) => {
 
 //Retrieve and return all users & Retrieve a single user
 exports.find = (req, res) => {
-    Userdb.find().then(user => {
-        res.send(user)
-    }).catch(err => {
-        res.status(500).send({ message : err.message || "Error occured while trying to retrieve user information."})
-    })
 
+    if(req.query.id) {
+        const id = req.query.id;
+
+        Userdb.findById(id)
+        .then(data => {
+            if(!data){
+                res.status(404).send({ message : "Could not find user with id" + id })
+            }
+            else {
+                res.send(data)
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ message : "Error retrieving user with id" + id })
+        })
+    }
+    
+    else {
+        Userdb.find().then(user => {
+            res.send(user)
+        }).catch(err => {
+            res.status(500).send({ message : err.message || "Error occured while trying to retrieve user information."})
+        })
+    }
 };
 
 //Update a new user identified by their ID
